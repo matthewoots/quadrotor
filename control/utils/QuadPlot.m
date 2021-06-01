@@ -18,6 +18,7 @@ classdef QuadPlot < handle
         state_des_hist;   % desired position history
         time_hist;      % time history
         max_iter;       % max iteration
+        euler_hist;     % euler history
     end
 
     properties (SetAccess = private)
@@ -48,6 +49,7 @@ classdef QuadPlot < handle
             Q.state_hist = zeros(6, max_iter);
             Q.state_des_hist = zeros(6, max_iter);
             Q.time_hist = zeros(1, max_iter);
+            Q.euler_hist = zeros(3, max_iter);
 
             % Initialize plot handle
             if nargin < 7, h_3d = gca; end
@@ -94,6 +96,10 @@ classdef QuadPlot < handle
             Q.k = Q.k + 1;
             Q.time_hist(Q.k) = Q.time;
             Q.state_hist(:,Q.k) = Q.state(1:6);
+            % Rotation about XYZ corresponds to the axis of the MATLAB
+            % coordinate system
+            % Convention : Pitch up = +ve, CCW Yaw = +ve
+            Q.euler_hist(:,Q.k) = rotm2eul(Q.rot,'XYZ');
             Q.state_des_hist(:,Q.k) = Q.des_state(1:6);
         end
 
