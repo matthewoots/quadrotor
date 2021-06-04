@@ -113,6 +113,7 @@ classdef QuadPlot < handle
             Q.time_hist = Q.time_hist(1:Q.k);
             Q.state_hist = Q.state_hist(:, 1:Q.k);
             Q.state_des_hist = Q.state_des_hist(:, 1:Q.k);
+            Q.euler_hist = Q.euler_hist(:, 1:Q.k);
         end
 
         % Update quad plot
