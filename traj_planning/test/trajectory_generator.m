@@ -23,7 +23,7 @@ function [ desired_state ] = trajectory_generator(t, qn, map, path)
 persistent map0 path0 total_time X ts;
 if numel(t) == 0 | numel(qn) == 0
    map0 = map;
-   path{1} = simplify_path2(map, path{1});
+%    path{1} = simplify_path2(map, path{1});
    path0 = path;
    [ts, total_time] = generate_ts(path0{1});
    path0{1}

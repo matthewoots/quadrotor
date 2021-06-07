@@ -1,4 +1,17 @@
-function [xtraj, ttraj, terminate_cond, desState] = test_trajectory(start, stop, map, path, vis)
+clear all
+close all
+
+load('simple.mat');
+
+clear path;
+
+path{1}(1,:) = [0, -4.9, 0.2];
+path{1}(2,:) = [-5, 5, 0.2];
+path{1}(3,:) = [5, 10, 0.2];
+path{1}(4,:) = [6, 17, 5];
+
+trajectory_generator([], [], map, path);
+
 % TEST_TRAJECTORY simulates the robot from START to STOP following a PATH
 % that's been planned for MAP.
 % start - a 3d vector or a cell contains multiple 3d vectors
@@ -30,9 +43,8 @@ params = crazyflie();
 
 %% **************************** FIGURES *****************************
 % Environment figure
-if nargin < 5
-    vis = true;
-end
+vis = true;
+
 
 fprintf('Initializing figures...\n')
 if vis
@@ -105,8 +117,40 @@ for iter = 1:max_iter
         xtraj{qn}((iter-1)*nstep+1:iter*nstep,:) = xsave(1:end-1,:);
         ttraj{qn}((iter-1)*nstep+1:iter*nstep)   = tsave(1:end-1);
 
+        map0 = map;
+        path0 = path;
+        [ts, total_time] = generate_ts(path{1});
+        path{1}
+        X = traj_opt3(path{1}, total_time,ts);
+       
+        p = path{qn};
+        if (time + cstep) >= total_time
+            pos = p(end,:);
+            vel = [0;0;0];
+            acc = [0;0;0];
+        else
+        %     
+        %     3rd order trajectory planning
+        k = find(ts<=(time + cstep));
+        k = k(end);
+        pos = [(time + cstep)^3, (time + cstep)^2, (time + cstep), 1]*X(4*(k-1)+1:4*k,:);
+        vel = [3*(time + cstep)^2, 2*(time + cstep), 1, 0]*X(4*(k-1)+1:4*k,:);
+        acc = [6*(time + cstep), 2, 0, 0]*X(4*(k-1)+1:4*k,:);
+        end
+
+        yaw = 0;
+        yawdot = 0;
+
+        % =================== Your code ends here ===================
+
+        desired_state.pos = pos(:);
+        desired_state.vel = vel(:);
+        desired_state.acc = acc(:);
+        desired_state.yaw = yaw;
+        desired_state.yawdot = yawdot;
+        
+        
         % Update quad plot
-        desired_state = trajhandle(time + cstep, qn);
         desState(:,iter) = transpose(desired_state.pos);
         
         QP{qn}.UpdateQuadPlot(x{qn}, [desired_state.pos; desired_state.vel], time + cstep);
@@ -163,4 +207,6 @@ if vis
     end
 end
 
-end
+figure(110)
+plot3(desState(1,1:iter),desState(2,1:iter),desState(3,1:iter));
+grid on
