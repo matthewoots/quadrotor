@@ -19,7 +19,7 @@ function params = crazyflie()
 %   height = 0.012m
 %
 
-m = 0.030;  % weight (in kg) with 5 vicon markers (each is about 0.25g)
+m = 1.030;  % weight (in kg) with 5 vicon markers (each is about 0.25g)
 g = 9.81;   % gravitational constant
 I = [1.43e-5,   0,          0; % inertial tensor in m^2 kg
      0,         1.43e-5,    0;
